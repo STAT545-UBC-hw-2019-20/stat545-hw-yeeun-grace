@@ -9,7 +9,17 @@ output:
     toc: yes
     toc_float: yes
 ---
+# Data Structure 
+```{r, echo = FALSE, warning = FALSE}
+str(mtcars)
 
+```
+
+# Data summary (descriptive statistics)
+```{r, echo = FALSE, warning = FALSE}
+summary(mtcars)
+
+```
 ## Table 
 
 ```{r, echo = FALSE, warning = FALSE}
@@ -18,5 +28,5 @@ library(tibble)
 library(DT)
 
 DT::datatable(mtcars)
-```
 
+```

@@ -1,4 +1,4 @@
-# For you, my visitors,
+# For you, my visitors :-)
 
 ## What is this repository for?
 You can find all my assignments for STAT 545 at the University of British Columbia.
@@ -18,3 +18,4 @@ There is a beauty of sharing meal & time together.
 As Barbara Coloroso said:
 > There is something profoundly satisfying about sharing a meal. 
 > Eating together, breaking bread together, is one of the oldest and most fundamentally unifying of human experiences. 
+![picture] (https://unsplash.com/photos/_UIVmIBB3JU)

@@ -1,0 +1,113 @@
+---
+title: "hw05"
+author: "Yeeun Lee"
+output: html_document
+---
+
+# Exercise 1: Explain the value of the here::here package 
+"here::here()" provides a simple way to detect the root directory as well as set a working directory. What I like about "here" package most is that I can easily detect root directory of a file or data or work with paths, and those do not need to correspond to the working directory. That is the big difference between 'hear' and 'setwd' or 'getwd'. 
+Moreover, by setting relative paths, users do not need to specify all paths explicitly, which makes R project accessible in a platform-independent way.
+
+
+# Exercise 2: Factor management
+
+Step1. Selecting datase: gapminder
+```{r, include=FALSE, message=FALSE}
+library(gapminder)
+library(tidyverse)
+library(dplyr)
+library(forcats)
+library(ggplot2)
+library(here)
+library(plotly)
+library(tidyverse)
+```
+
+Step 2: Check levels
+I will first check (1) whether continent is factor or character and (2) what are the levels
+```{r}
+class(gapminder$continent)
+levels(gapminder$continent)
+```
+
+Step 3: Drop "Oceania""
+```{r, warning = FALSE, message = FALSE}
+gap_drop_oceania <- gapminder %>% 
+  filter(!continent == "Oceania")
+gap_drop_oceania  %>% 
+  droplevels()
+gap_drop_oceania
+
+```
+
+Step 4: Reorder the levels of country or continent. 
+I will select 4 East Asia countries and reorder the levels of country by gdpPercap.  
+```{r}
+eastasia <- c("Japan", "Korea, Rep.", "China", "Korea, Dem. Rep.")
+east_asia <- gapminder %>%
+  filter(country %in% eastasia)
+
+ggplot(east_asia, aes(x=year, y= gdpPercap, 
+            color = fct_reorder2(country, year, gdpPercap))) +
+  geom_line()+ 
+  labs (color="country")
+
+```
+
+
+# Exercise 3: File input/output (I/O) 
+
+
+Step 1. Export the East_asian file
+
+```{r}
+write_csv(east_asia, here("east_asia.csv"))
+```
+
+Step 2. Import the file again.
+
+```{r, message=FALSE, warning= FALSE, results=FALSE}
+read_csv(here::here("east_asia.csv"))
+```
+
+
+# Exercise 4: Visualization design
+
+Step 1: Selecting one previous plot: (hw 03)How is life expectancy changing over time on different continents?
+```{r}
+plot1 <- gapminder %>%
+  group_by(continent, year) %>%    
+  mutate(life_expectancy = mean(lifeExp)) %>%
+  ggplot(aes(year, life_expectancy, colour = continent)) + geom_line(alpha = 0.4)
+
+plot1
+```
+
+Step 2: Revising the plot: chaging the labels; adding the title; making it interactive using plotly package 
+```{r}
+plot2 <- gapminder %>%
+  group_by(continent, year) %>%    
+  mutate(life_expectancy = mean(lifeExp)) %>%
+  ggplot(aes(year, life_expectancy, colour = continent)) +
+  geom_line(alpha = 0.4) +
+  labs(title="Life expectancy changes by continent", x="Year", y="Life expectancy") +
+  theme(panel.grid.minor = element_blank())
+
+plot2 %>%
+  ggplotly()
+
+```
+
+Step 3: Placing these plots side-by-side:
+
+```{r}
+(plot_comparison<- gridExtra::grid.arrange(plot1, plot2, ncol = 2))
+```
+
+# Exercise 5: Writing figures to file
+
+```{r}
+ggsave("life_expectancy.png", plot = plot_comparison, width = 20, height = 10, dpi = 300)
+```
+
+

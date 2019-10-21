@@ -1,0 +1,107 @@
+---
+title: "hw04"
+output: html_document
+---
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(gapminder)
+library(ggridges)
+library(scales)
+library(dplyr)
+library(tibble)
+```
+
+#Exercise 1. Univariate Option 1
+Step1. Make a tibble with one row per year, and columns for life expectancy for two or more countries.
+
+```{r}
+Asia_lifeexp <- gapminder %>%
+  filter(continent == "Asia") %>%
+  select(year, country, lifeExp) %>%
+  pivot_wider(id_cols = year,
+            names_from = country,
+            values_from = lifeExp)
+DT::datatable(Asia_lifeexp)
+```
+
+Step 2. Take advantage of this new data shape to scatterplot life expectancy for one country against that of another. 
+```{r}
+Asia_lifeexp %>%
+  select(China, `Hong Kong, China`) %>% 
+  ggplot()+
+  geom_point(aes(China, `Hong Kong, China`))
+```
+
+Step 3. Re-lengthen the data. tidyr::pivot_longer().
+```{r}
+Asia_lifeexp %>% 
+  pivot_longer(cols = -year,
+               names_to = "country",
+               values_to = "LifeExp") %>% 
+  arrange(country, year)
+
+```
+
+#Exercise 2: Multivariate Data Reshaping
+Step 1.Make a tibble with one row per year, and columns for life expectancy and GDP per capita (or two other numeric variables) for two or more countries.
+
+-> I selected Oceania.
+
+```{r}
+
+oceania <- gapminder %>%
+  filter (continent == 'Oceania') %>%
+  pivot_wider(id_cols = c(year, continent),
+              names_from  = country,
+              names_sep   = "_",
+              values_from = c(lifeExp, gdpPercap))
+
+```
+
+Step2. Re-lengthen the data.
+```{r}
+oceania %>% pivot_longer(cols = c(-continent, -year),
+                    names_to = c(".value", "country"),
+                    names_sep = "_")
+  
+```
+
+
+#Exercise 3: Table Joins
+Read in the made-up wedding guestlist and email addresses using the following lines (go ahead and copy-paste these):
+```{r, message = FALSE, warning = FALSE}
+guest <- read_csv("https://raw.githubusercontent.com/STAT545-UBC/Classroom/master/data/wedding/attend.csv")
+email <- read_csv("https://raw.githubusercontent.com/STAT545-UBC/Classroom/master/data/wedding/emails.csv")
+
+guest
+email
+```
+
+Then, complete the following tasks using the tidyverse (tidyr, dplyr, …). No need to do any pivoting – feel free to leave guest in its current format.
+
+Step 1. For each guest in the guestlist (guest tibble), add a column for email address, which can be found in the email tibble.
+```{r}
+
+email1 <- email %>%
+  separate_rows(guest, sep = ',') %>% 
+  rename(name = guest) 
+
+  
+guest <- guest %>%
+  left_join(email1, by = "name")
+
+ 
+```
+
+Step 2. Who do we have emails for, yet are not on the guestlist?
+```{r}
+email1 %>% 
+  anti_join(guest, by = "email")
+```
+
+Step 3. Make a guestlist that includes everyone we have emails for (in addition to those on the original guestlist).
+```{r}
+guest %>% 
+  semi_join(email1, by = "email")
+```
+

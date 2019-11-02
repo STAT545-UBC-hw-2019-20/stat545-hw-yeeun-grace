@@ -89,8 +89,6 @@ email1 <- email %>%
   
 guest <- guest %>%
   left_join(email1, by = "name")
-
- 
 ```
 
 Step 2. Who do we have emails for, yet are not on the guestlist?
